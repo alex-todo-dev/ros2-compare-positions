@@ -28,6 +28,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pick_place_ik = pick_place_ik.pick_place_ik:main',
+            'set_home_pose = pick_place_ik.set_home_pose:main',
         ],
     },
 )

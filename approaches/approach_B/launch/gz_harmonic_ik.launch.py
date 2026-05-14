@@ -4,7 +4,7 @@ from launch import LaunchDescription
 from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -100,4 +100,16 @@ def generate_launch_description():
         )
     )
 
-    return LaunchDescription([gz_sim, bridge, rsp, spawn_robot, after_spawn, after_jsb])
+    set_home = ExecuteProcess(
+        cmd=[FindExecutable(name='ros2'), 'run', 'pick_place_ik', 'set_home_pose'],
+        output='screen'
+    )
+
+    after_arm = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=load_arm,
+            on_exit=[set_home]
+        )
+    )
+
+    return LaunchDescription([gz_sim, bridge, rsp, spawn_robot, after_spawn, after_jsb, after_arm])

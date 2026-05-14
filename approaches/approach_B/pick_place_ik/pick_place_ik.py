@@ -135,18 +135,18 @@ class PickPlaceIK(Node):
         self.get_logger().info('Pick sequence complete.')
 
     def _pick_sequence(self):
-        seeds = {
-            'pre_grasp': SEED_PRE_GRASP,
-            'grasp':     SEED_GRASP,
-            'lift':      SEED_GRASP,
-        }
-
         self._open_gripper()
         self._move_joints('home', HOME_JOINTS, sec=4)
 
+        solved = {}
+        seeds = {'pre_grasp': SEED_PRE_GRASP, 'grasp': SEED_GRASP}
+
         for name in ['pre_grasp', 'grasp', 'lift']:
+            # use previously solved grasp angles as seed for lift
+            seed = solved.get('grasp', seeds.get(name, SEED_GRASP))
             target = WAYPOINTS_CART[name]
-            joints = ik_solve(self._chain, self._arm_indices, target, seeds[name])
+            joints = ik_solve(self._chain, self._arm_indices, target, seed)
+            solved[name] = joints
             j_str = ', '.join(f'{v:.3f}' for v in joints)
             self.get_logger().info(
                 f'{self._ts()} IK {name}: target={list(np.round(target, 4))} -> [{j_str}]'
