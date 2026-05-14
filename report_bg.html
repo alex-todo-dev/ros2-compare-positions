@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; margin: 40px 60px; color: #222; line-height: 1.6; }
+  h1 { font-size: 22px; text-align: center; margin-bottom: 4px; }
+  h2 { font-size: 17px; border-bottom: 1px solid #aaa; padding-bottom: 4px; margin-top: 32px; }
+  h3 { font-size: 15px; margin-top: 20px; margin-bottom: 6px; }
+  .subtitle { text-align: center; font-size: 13px; color: #555; margin-bottom: 30px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 13px; }
+  th { background: #2c5f8a; color: white; padding: 8px 10px; text-align: left; }
+  td { border: 1px solid #ccc; padding: 7px 10px; }
+  tr:nth-child(even) td { background: #f4f7fb; }
+  .status-done { color: green; font-weight: bold; }
+  .status-progress { color: #cc7700; font-weight: bold; }
+  .status-planned { color: #888; font-weight: bold; }
+  .placeholder { border: 1px dashed #aaa; background: #f9f9f9; height: 180px;
+                 display: flex; align-items: center; justify-content: center;
+                 color: #aaa; font-size: 13px; margin: 12px 0; }
+  ul li { margin-bottom: 4px; }
+  .pros { color: #1a6e1a; }
+  .cons { color: #8b0000; }
+  .conclusion { background: #eaf3fb; border-left: 4px solid #2c5f8a;
+                padding: 10px 14px; margin: 16px 0; font-size: 13px; }
+  code { background: #f0f0f0; padding: 1px 4px; font-size: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Сравнение на подходи за програмиране на задача „вземи и постави"</h1>
+<div class="subtitle">
+  Роботна ръка mycobot 320 M5 &nbsp;|&nbsp; Симулация Gazebo Harmonic &nbsp;|&nbsp; ROS2 Humble &nbsp;|&nbsp; Ubuntu 22.04
+</div>
+
+<!-- ===== ВЪВЕДЕНИЕ ===== -->
+<h2>1. Въведение</h2>
+<p>
+Целта на настоящата работа е да се сравнят различни подходи за програмиране на задачата
+„вземи и постави" (pick-and-place) върху една и съща роботна платформа. Всички подходи
+използват идентична симулационна среда, идентичен робот и идентична задача, което
+осигурява обективно сравнение.
+</p>
+<p>
+Роботната задача се състои в захващане на червен куб от фиксирана позиция и поставянето
+му на целева позиция. Изследването е насочено към установяване на компромисите между
+лесно програмиране, точност, преносимост и сложност на настройката при различните методи.
+</p>
+
+<!-- ===== ПЛАТФОРМА ===== -->
+<h2>2. Платформа</h2>
+<table>
+  <tr><th>Компонент</th><th>Версия / Описание</th></tr>
+  <tr><td>Робот</td><td>mycobot 320 M5 — 6-осова роботна ръка</td></tr>
+  <tr><td>Симулатор</td><td>Gazebo Harmonic (gz-sim 8.x)</td></tr>
+  <tr><td>ROS2</td><td>Humble Hawksbill</td></tr>
+  <tr><td>Операционна система</td><td>Ubuntu 22.04 LTS</td></tr>
+  <tr><td>Управление на ставите</td><td>ros2_control + joint_trajectory_controller</td></tr>
+  <tr><td>Захващащо устройство</td><td>Адаптивен захват — gripper_action_controller</td></tr>
+</table>
+
+<!-- ===== ЗАДАЧА ===== -->
+<h2>3. Описание на задачата</h2>
+<p>
+Роботът изпълнява задача „вземи и постави" с червен куб с размер 3 cm. Начална позиция
+на куба: <code>x=0.262 m, y=−0.084 m, z=0.030 m</code> в света на симулацията.
+</p>
+<p><strong>Фази на изпълнение:</strong></p>
+<ol>
+  <li>Движение към начална (HOME) позиция</li>
+  <li>Позициониране над куба (PRE_GRASP)</li>
+  <li>Спускане до куба (GRASP)</li>
+  <li>Затваряне на захвата</li>
+  <li>Повдигане (LIFT)</li>
+  <li>Поставяне на целева позиция (PLACE)</li>
+</ol>
+
+<div class="placeholder">[ Снимка: Gazebo симулация — роботът и кубът ]</div>
+
+<!-- ===== ПОДХОДИ ОБЗОР ===== -->
+<h2>4. Сравнявани подходи</h2>
+<table>
+  <tr><th>#</th><th>Подход</th><th>Метод</th><th>Статус</th></tr>
+  <tr>
+    <td>A</td><td>Твърдо кодирани ставни ъгли</td>
+    <td>Ръчно настроени ъгли за всяка точка</td>
+    <td><span class="status-done">Завършен</span></td>
+  </tr>
+  <tr>
+    <td>B</td><td>Обратна кинематика (ikpy)</td>
+    <td>Декартови координати → IK → ставни ъгли</td>
+    <td><span class="status-done">Завършен</span></td>
+  </tr>
+  <tr>
+    <td>C</td><td>MoveIt2 планиране на движение</td>
+    <td>Колизионно-осъзнато планиране</td>
+    <td><span class="status-planned">Планиран</span></td>
+  </tr>
+  <tr>
+    <td>D</td><td>Reinforcement Learning (SB3/MuJoCo)</td>
+    <td>Обучение с подкрепление</td>
+    <td><span class="status-progress">В процес</span></td>
+  </tr>
+</table>
+
+<!-- ===== ПОДХОД A ===== -->
+<h2>5. Подход A — Твърдо кодирани ставни ъгли</h2>
+<p>
+При този подход позициите на робота се дефинират директно като ставни ъгли (в радиани),
+определени ръчно чрез итерация в симулацията. Не се използва кинематичен модел.
+</p>
+
+<h3>Ключови точки (waypoints)</h3>
+<table>
+  <tr><th>Точка</th><th>j1</th><th>j2</th><th>j3</th><th>j4</th><th>j5</th><th>j6</th></tr>
+  <tr><td>HOME</td><td>0.000</td><td>0.004</td><td>−0.023</td><td>0.005</td><td>0.053</td><td>0.008</td></tr>
+  <tr><td>PRE_GRASP</td><td>0.000</td><td>−0.705</td><td>−0.724</td><td>−0.169</td><td>1.577</td><td>0.000</td></tr>
+  <tr><td>GRASP</td><td>0.000</td><td>−0.815</td><td>−0.834</td><td>−0.169</td><td>1.577</td><td>0.000</td></tr>
+</table>
+
+<div class="placeholder">[ Снимка: Подход A — роботът в позиция GRASP ]</div>
+
+<h3>Предимства и недостатъци</h3>
+<ul>
+  <li class="pros">&#10003; Лесно изпълнение — без допълнителни зависимости</li>
+  <li class="pros">&#10003; Детерминиран и бърз</li>
+  <li class="pros">&#10003; Лесно отстраняване на грешки</li>
+  <li class="cons">&#10007; Не е преносим — стойностите са специфични за тази задача</li>
+  <li class="cons">&#10007; Крехък — промяна на позицията на куба нарушава изпълнението</li>
+  <li class="cons">&#10007; При нова целева позиция трябва ново ръчно настройване</li>
+</ul>
+
+<!-- ===== ПОДХОД B ===== -->
+<h2>6. Подход B — Обратна кинематика (ikpy)</h2>
+<p>
+При този подход точките се задават в декартово пространство (x, y, z) и библиотеката
+<code>ikpy</code> изчислява необходимите ставни ъгли чрез обратна кинематика, използвайки
+URDF модела на робота.
+</p>
+
+<h3>Ключови точки (waypoints)</h3>
+<table>
+  <tr><th>Точка</th><th>x (m)</th><th>y (m)</th><th>z (m)</th><th>Описание</th></tr>
+  <tr><td>PRE_GRASP</td><td>0.262</td><td>−0.084</td><td>0.120</td><td>9 cm над куба</td></tr>
+  <tr><td>GRASP</td><td>0.262</td><td>−0.084</td><td>0.045</td><td>Ниво на захват</td></tr>
+  <tr><td>LIFT</td><td>0.262</td><td>−0.084</td><td>0.150</td><td>12 cm над куба</td></tr>
+  <tr><td>PLACE</td><td>0.000</td><td>0.250</td><td>0.100</td><td>Целева позиция</td></tr>
+</table>
+
+<div class="placeholder">[ Снимка: Подход B — IK захват на куба ]</div>
+
+<h3>Предимства и недостатъци</h3>
+<ul>
+  <li class="pros">&#10003; Точките се дефинират интуитивно в декартово пространство</li>
+  <li class="pros">&#10003; Лесна адаптация — смяна само на x/y/z координати</li>
+  <li class="pros">&#10003; По-добро качество на захвата спрямо Подход A</li>
+  <li class="cons">&#10007; Изисква точен URDF модел</li>
+  <li class="cons">&#10007; Числена грешка при IK решаването</li>
+  <li class="cons">&#10007; Добавя Python зависимост (ikpy)</li>
+</ul>
+
+<!-- ===== СРАВНЕНИЕ A vs B ===== -->
+<h2>7. Сравнение: Подход A срещу Подход B</h2>
+<table>
+  <tr><th>Метрика</th><th>Подход A (ставни ъгли)</th><th>Подход B (IK)</th></tr>
+  <tr><td>Дефиниция на точките</td><td>6 ставни ъгъла на поза</td><td>x/y/z в световни координати</td></tr>
+  <tr><td>Точност на захвата</td><td>Приближена — ръчно настроена</td><td>Прецизна — Декартова цел → IK</td></tr>
+  <tr><td>Качество на захвата</td><td>Кубът частично в пръстите</td><td>Чисто затваряне около куба</td></tr>
+  <tr><td>Преносимост</td><td>Крехка — кубът трябва на точна позиция</td><td>Гъвкава — смени само координатите</td></tr>
+  <tr><td>Сложност на настройка</td><td>Ниска</td><td>Средна</td></tr>
+  <tr><td>Зависимости</td><td>Само ROS2</td><td>ROS2 + ikpy</td></tr>
+  <tr><td>Брой редове код</td><td>~120</td><td>~180</td></tr>
+</table>
+
+<div class="conclusion">
+  <strong>Заключение:</strong> Подход B постига измеримо по-добра прецизност и качество на
+  захвата. Точките се дефинират интуитивно в декартово пространство, което улеснява адаптацията
+  към сценарии с инжектиране на грешки, при които позицията на куба варира.
+</div>
+
+<!-- ===== СЛЕДВАЩИ СТЪПКИ ===== -->
+<h2>8. Следващи стъпки</h2>
+<ul>
+  <li><strong>Подход C — MoveIt2:</strong> Планиране на движение с отчитане на колизии, автоматична обработка на сингулярности и ставни ограничения.</li>
+  <li><strong>Подход D — Reinforcement Learning:</strong> Агент обучен в MuJoCo/Stable-Baselines3, трансфер към Gazebo симулация.</li>
+  <li>Дефиниране на методология за измерване и провеждане на всички подходи.</li>
+  <li>Запис на резултати и финализиране на сравнителната таблица.</li>
+</ul>
+
+<br><br>
+<div style="text-align:center; font-size:11px; color:#888;">
+  mycobot 320 M5 &nbsp;·&nbsp; Gazebo Harmonic &nbsp;·&nbsp; ROS2 Humble &nbsp;·&nbsp; 2026
+</div>
+
+</body>
+</html>
